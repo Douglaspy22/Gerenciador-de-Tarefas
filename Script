@@ -1,0 +1,108 @@
+import pandas as pd
+import datetime
+
+# Classe Tarefa para gerenciar uma única tarefa
+class Tarefa:
+    def __init__(self, descricao, prazo):
+        self.descricao = descricao
+        self.prazo = datetime.datetime.strptime(prazo, '%Y-%m-%d')
+        self.concluida = False
+        self.data_conclusao = None
+
+    def concluir(self):
+        self.concluida = True
+        self.data_conclusao = datetime.datetime.now()
+
+    def __str__(self):
+        return f"{self.descricao} | Prazo: {self.prazo.strftime('%Y-%m-%d')} | Status: {'Concluída' if self.concluida else 'Pendente'}"
+
+
+# Classe GerenciadorDeTarefas para gerenciar várias tarefas
+class GerenciadorDeTarefas:
+    def __init__(self):
+        self.tarefas = []
+
+    def adicionar_tarefa(self, descricao, prazo):
+        tarefa = Tarefa(descricao, prazo)
+        self.tarefas.append(tarefa)
+
+    def listar_tarefas(self):
+        if not self.tarefas:
+            print("Nenhuma tarefa cadastrada!")
+            return
+        for i, tarefa in enumerate(self.tarefas):
+            print(f"{i}. {tarefa}")
+
+    def concluir_tarefa(self, indice):
+        if 0 <= indice < len(self.tarefas):
+            self.tarefas[indice].concluir()
+            print(f"Tarefa '{self.tarefas[indice].descricao}' concluída com sucesso!")
+        else:
+            print("Índice de tarefa inválido!")
+
+    def gerar_relatorio_produtividade(self):
+        concluídas = [t for t in self.tarefas if t.concluida]
+        pendentes = [t for t in self.tarefas if not t.concluida]
+        total_tarefas = len(self.tarefas)
+        tarefas_concluídas = len(concluídas)
+        produtividade = (tarefas_concluídas / total_tarefas) * 100 if total_tarefas > 0 else 0
+
+        print(f"\nRelatório de Produtividade:")
+        print(f"Total de tarefas: {total_tarefas}")
+        print(f"Tarefas concluídas: {tarefas_concluídas}")
+        print(f"Produtividade: {produtividade:.2f}%")
+
+        if pendentes:
+            print(f"\nTarefas pendentes:")
+            for t in pendentes:
+                print(t)
+
+        if concluídas:
+            print(f"\nTarefas concluídas:")
+            for t in concluídas:
+                print(t)
+
+
+# Função de menu para interagir com o usuário
+def menu():
+    gerenciador = GerenciadorDeTarefas()
+    
+    while True:
+        print("\n===== Gerenciador de Tarefas =====")
+        print("1. Adicionar Tarefa")
+        print("2. Listar Tarefas")
+        print("3. Concluir Tarefa")
+        print("4. Gerar Relatório de Produtividade")
+        print("5. Sair")
+        
+        opcao = input("Escolha uma opção: ")
+
+        if opcao == '1':
+            descricao = input("Descrição da tarefa: ")
+            prazo = input("Prazo da tarefa (AAAA-MM-DD): ")
+            gerenciador.adicionar_tarefa(descricao, prazo)
+
+        elif opcao == '2':
+            gerenciador.listar_tarefas()
+
+        elif opcao == '3':
+            try:
+                indice = int(input("Índice da tarefa a ser concluída: "))
+                gerenciador.concluir_tarefa(indice)
+            except ValueError:
+                print("Por favor, insira um índice válido!")
+
+        elif opcao == '4':
+            gerenciador.gerar_relatorio_produtividade()
+
+        elif opcao == '5':
+            print("Saindo do Gerenciador de Tarefas...")
+            break
+
+        else:
+            print("Opção inválida! Tente novamente.")
+
+
+# Executa o gerenciador de tarefas
+if __name__ == '__main__':
+    menu()
